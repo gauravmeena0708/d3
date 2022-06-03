@@ -1,0 +1,53 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>A D3 map using topojson</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+
+  <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+  <style>
+    path {
+      fill: #ccc;
+      stroke: #fff;
+      stroke-width: .5px;
+    }
+    
+    path:hover {
+      fill: red;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    var width = 900,
+      height = 600;
+
+    var path = d3.geo.path()
+      .projection(null);
+
+    var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    queue()
+      .defer(d3.json, "https://www.covid19india.org/mini_maps/india.json")
+      .await(ready);
+
+    function ready(error, counties) {
+
+      svg.append("g")
+        .selectAll("path")
+        .data(topojson.feature(counties, counties.objects.states).features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("class", "state");
+    }
+  </script>
+</body>
+
+</html>
