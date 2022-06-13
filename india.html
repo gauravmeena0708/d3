@@ -48,11 +48,11 @@
 		function ready(datasources) {
 			let counties = datasources[0];
 			let data = datasources[1];
-
+			let mapInfo = topojson.feature(counties, counties.objects.states);
 			console.log(data);
 			svg.append("g")
 				.selectAll("path")
-				.data(topojson.feature(counties, counties.objects.states).features)
+				.data(mapInfo.features)
 				.enter()
 				.append("path")
 				.attr("d", d => path(d))
