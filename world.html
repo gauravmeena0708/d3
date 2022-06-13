@@ -1,58 +1,98 @@
 <!DOCTYPE html>
 <head>
-<meta charset="utf-8">
-
-<!-- Load d3.js -->
-<script src="https://d3js.org/d3.v4.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+	<meta charset="utf-8">
+	<!-- Load d3.js -->
+	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+	<style>
+		.tooltip {
+			position: absolute;
+			width: 150px;
+			height: 40px;
+			padding: 10px;
+			font: 12px sans-serif;
+			background: lightsteelblue;
+			border: 0px;
+			border-radius: 8px;
+			pointer-events: none;
+		}
+	</style>
 </head>
 <body>
-<!-- Create an element where the map will take place -->
-<svg id="world" width="400" height="300"></svg>
-<script>
+	<!-- Create an element where the map will take place -->
+	
+	<div id="world">
+		<svg id="world1" width="400" height="300"></svg></div>
+	<script>
 
-// The svg
-var svg = d3.select("#world"),
-  width = +svg.attr("width"),
-  height = +svg.attr("height");
+	// The svg
+	var svg = d3.select("svg"),
+	  width = +svg.attr("width"),
+	  height = +svg.attr("height");
 
-// Map and projection
-var path = d3.geoPath();
-var projection = d3.geoMercator()
-  .scale(70)
-  .center([0,20])
-  .translate([width / 2, height / 2]);
+	// Map and projection
+	var path = d3.geoPath();
+	var projection = d3.geoMercator()
+	  .scale(70)
+	  .center([0,20])
+	  .translate([width / 2, height / 2]);
 
-// Data and color scale
-var data = d3.map();
-var colorScale = d3.scaleThreshold()
-  .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-  .range(d3.schemeBlues[7]);
+	// Data and color scale
+	var data = d3.map();
+	var colorScale = d3.scaleThreshold()
+	  .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+	  .range(d3.schemeBlues[7]);
 
+	var add_tooltip = function(){
+		var div = d3.select("#world").append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0);
+	}; 
+			
+	var format_flood = function(d) {
+		var html = "";
+			html += "id: " + d.id +"<br/>";
+			html += "total: " + d.total +"<br/>";
+			return html;
+	}
 // Load external data and boot
-d3.queue()
-  .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-  .defer(d3.csv, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) { data.set(d.code, +d.pop); })
-  .await(ready);
+	d3.queue()
+		.defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+		.defer(d3.csv, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) { data.set(d.code, +d.pop); })
+		.await(ready);
 
-function ready(error, topo) {
+	function ready(error, topo) {
 
-  // Draw the map
-  svg.append("g")
-    .selectAll("path")
-    .data(topo.features)
-    .enter()
-    .append("path")
-      // draw each country
-      .attr("d", d3.geoPath()
-        .projection(projection)
-      )
-      // set the color of each country
-      .attr("fill", function (d) {
-        d.total = data.get(d.id) || 0;
-        return colorScale(d.total);
-      });
+	// Draw the map
+		svg.append("g")
+			.selectAll("path")
+			.data(topo.features)
+			.enter()
+			.append("path")
+			// draw each country
+			.attr("d", d3.geoPath().projection(projection))
+			// set the color of each country
+			.attr("fill", function (d) {
+				d.total = data.get(d.id) || 0;
+				return colorScale(d.total);
+			})
+			.on("mouseover", function(d) {
+				var tooltip = d3.select('.tooltip');
+				tooltip.transition()
+					.duration(200)
+					.style("opacity", .9);
+				tooltip.html(format_flood(d))
+					.style("left", (d3.event.pageX) + "px")
+					.style("top", (d3.event.pageY - 28) + "px");
+			})
+			.on("mouseout", function(d) {
+				var tooltip = d3.select('.tooltip');
+				tooltip.transition()
+					.duration(500)
+					.style("opacity", 0);
+			});
+		add_tooltip();
     }
 
 </script>
