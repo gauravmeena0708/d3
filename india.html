@@ -10,13 +10,12 @@
   <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <style>
     path {
-      fill: #ccc;
       stroke: #fff;
       stroke-width: .5px;
     }
     
     path:hover {
-      fill: red;
+      fill: black;
     }
   </style>
 </head>
@@ -48,8 +47,29 @@
 		function ready(datasources) {
 			let counties = datasources[0];
 			let data = datasources[1];
+			
+			/*
+			Modifictation of data starts
+			*/
 			let mapInfo = topojson.feature(counties, counties.objects.states);
-			console.log(data);
+			let dataIndex = {};
+			for (let c of data) {
+				let country = c.state
+				dataIndex[country] = +c.population;
+			}
+			mapInfo.features = mapInfo.features.map(d => {
+				let country = d.properties.st_nm;  		//get Statename
+				let magnitude = dataIndex[country];     //get corresponding value from other array
+				d.properties.Magnitude = magnitude;     //set properties with the value from other array
+				return d;
+			});
+			
+			let maxEarthquake = d3.max(mapInfo.features, d => d.properties.Magnitude);
+			let medianMagnitude = d3.median(mapInfo.features, d => d.properties.Magnitude);
+			let cScale = d3.scaleLinear()
+				.domain([0, medianMagnitude, maxEarthquake])
+				.range(["white", "orange" ,"red"])
+
 			svg.append("g")
 				.selectAll("path")
 				.data(mapInfo.features)
@@ -57,8 +77,10 @@
 				.append("path")
 				.attr("d", d => path(d))
 				.attr("strock","black")
-				.attr("fill","none");
-				//.attr("class", "state");
+				.attr("fill", 
+						d => d.properties.Magnitude ?
+						cScale(d.properties.Magnitude) :
+						"white");
 			add_tooltip();
 		}
 	</script>
