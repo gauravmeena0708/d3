@@ -17,6 +17,18 @@
     path:hover {
       fill: black;
     }
+	
+	.tooltip {
+    position: absolute;
+    width: 200px;
+    height: 80px;
+    padding: 10px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
   </style>
 </head>
 
@@ -43,6 +55,14 @@
 					.attr("class", "tooltip")
 					.style("opacity", 0);
 		};
+		
+		var format_flood = function(d) {
+			//console.log(d);
+			var html = "";
+			html += "State: " + d.properties.st_nm +"<br/>";
+			html += "Population: " + d.properties.Magnitude +"<br/>";
+			return html;
+		}
 
 		function ready(datasources) {
 			let counties = datasources[0];
@@ -80,7 +100,23 @@
 				.attr("fill", 
 						d => d.properties.Magnitude ?
 						cScale(d.properties.Magnitude) :
-						"white");
+						"white")
+				.on("mouseover", function(event,d) {
+					var tooltip = d3.select('.tooltip');
+					tooltip.transition()
+						.duration(200)
+						.style("opacity", .9);
+					console.log(d);
+					tooltip.html(format_flood(d))
+						.style("left", (d3.event.pageX) + "px")
+						.style("top", (d3.event.pageY - 28) + "px");
+				})
+				.on("mouseout", function(event,d) {
+					var tooltip = d3.select('.tooltip');
+					tooltip.transition()
+						.duration(500)
+						.style("opacity", 0);
+				});
 			add_tooltip();
 		}
 	</script>
