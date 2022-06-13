@@ -10,8 +10,8 @@
   <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <style>
     path {
-      fill:#fff;
-      stroke: #000;
+      fill: #ccc;
+      stroke: #fff;
       stroke-width: .5px;
     }
     
@@ -22,41 +22,46 @@
 </head>
 
 <body>
-  <script>
-  //fill: #ccc;
-    var width = 900,
-      height = 600;
+	<div id="chart"></div>
+	<script>
+		var width = 900,
+		  height = 600;
 
-    var path = d3.geoPath()
-      .projection(null);
+		var path = d3.geoPath()
+		  .projection(null);
 
-    var svg = d3.select("body").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+		var svg = d3.select("#chart").append("svg")
+		  .attr("width", width)
+		  .attr("height", height);
 
-	Promise.all([
-		d3.json("https://www.covid19india.org/mini_maps/india.json"),
-		d3.csv("population.csv")	
-	]).then(ready);
-   
-    function ready(datasources) {
-      console.log(datasources);
-	  let counties = datasources[0];
-      let data = datasources[1];
-	 /* 
-	 function ready(error, counties) {*/
-	  console.log(topojson.feature(counties, counties.objects.states).features);
-      svg.append("g")
-        .selectAll("path")
-        .data(topojson.feature(counties, counties.objects.states).features)
-        .enter()
-        .append("path")
-        .attr("d", d => path(d))
-		.attr("strock","black")
-		.attr("fill","none");
-        //.attr("class", "state");
-    }
-  </script>
+		Promise.all([
+			d3.json("https://www.covid19india.org/mini_maps/india.json"),
+			d3.csv("population.csv")	
+		]).then(ready);
+		
+		var add_tooltip = function(){
+			var div = d3.select("#chart").append("div")
+					.attr("class", "tooltip")
+					.style("opacity", 0);
+		};
+
+		function ready(datasources) {
+			let counties = datasources[0];
+			let data = datasources[1];
+
+			console.log(data);
+			svg.append("g")
+				.selectAll("path")
+				.data(topojson.feature(counties, counties.objects.states).features)
+				.enter()
+				.append("path")
+				.attr("d", d => path(d))
+				.attr("strock","black")
+				.attr("fill","none");
+				//.attr("class", "state");
+			add_tooltip();
+		}
+	</script>
 </body>
 
 </html>
