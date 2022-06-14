@@ -15,6 +15,11 @@
     var width = window.innerWidth, height = window.innerHeight;
 
     var projection = d3.geoMercator();
+	
+	var projection1 = d3.geoMercator()
+                    .scale(800)
+					.center([77,21])
+					.translate([width/2,height/2]);
 
     var path = d3.geoPath()
         .projection(projection)
@@ -26,6 +31,15 @@
 
     var g = svg.append("g");
 
+	var markers = [
+  {long: 31.6340, lat: 74.8723, group: "A", size: 34}, // corsica
+  {long: 28.67, lat: 77.06, group: "A", size: 14}, // Delhi
+  {long: 22.349, lat: 78.864, group: "B", size: 87}, // Paris
+  {long: -21.397, lat: 73.664, group: "B", size: 41}, // Hossegor
+  {long: 23.075, lat: 80.640, group: "C", size: 78}, // Lille
+  {long: -23.83, lat: 88, group: "C", size: 12} // Morlaix
+];
+
     d3.json("india2.json", function(error, data){
 
       var boundary = centerZoom(data);
@@ -34,8 +48,11 @@
       drawSubUnitLabels(data);
       drawPlaces(data);
       drawOuterBoundary(data, boundary);
+	  drawMarkers(markers);
 
     });
+	
+	
 
     function centerZoom(data){
 
@@ -86,6 +103,8 @@
           .style("font-size", ".7em")
           .style("text-shadow", "0px 0px 2px #fff")
           .text(function(d) { return d.properties.name; });
+		  
+	
 
     }
 
@@ -118,6 +137,25 @@
           .text(function(d) { return d.properties.st_nm; });
 
     }
+	function drawMarkers(data){
+		console.log(data);
+		g.selectAll("myCircles")
+			.data(data)
+			.enter().append('circle')
+				.attr("cx", function(d) 
+					{ 
+						x = projection1([d.long, d.lat])[0]
+						console.log(x);
+						return x;
+					}
+				)//d => projection([d.long, d.lat])[0])
+				.attr("cy", d => projection1([d.long, d.lat])[1])
+				.attr("r", 14)
+				.style("fill", "#69b3a2")
+				.attr("stroke", "#69b3a2")
+				.attr("stroke-width", 3)
+				.attr("fill-opacity", .4)
+	}
 
     function colorSubunits(subunits) {
 
