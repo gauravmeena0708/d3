@@ -14,7 +14,7 @@ Promise.all([
 ]).then(ready);
 
 var add_tooltip = function(){
-	var div = d3.select("#chart").append("div")
+	var div = d3.select("#chart1").append("div")
 			.attr("class", "tooltip")
 			.style("opacity", 0);
 };
@@ -69,7 +69,6 @@ function ready(datasources) {
 			tooltip.transition()
 				.duration(200)
 				.style("opacity", .9);
-			console.log(d);
 			tooltip.html(add_tooltip_text(d))
 				.style("left", (event.pageX) + "px")
 				.style("top", (event.pageY - 28) + "px");
