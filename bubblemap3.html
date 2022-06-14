@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+
+	<!-- Load d3.js -->
+	<script src="https://d3js.org/d3.v6.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+</head>
+<body>
+	<!-- Create an element where the map will take place -->
+	<div id="bubble"></div>
+	<script>
+
+	// The svg
+	var width = 1800,
+	height = 900;
+
+	
+
+	var svg = d3.select("#bubble").append("svg")
+	  .attr("width", width)
+	  .attr("height", height);
+  
+  
+
+	// Map and projection
+	var projection = d3.geoMercator()
+                    .scale(800)
+					.center([77,21])
+					.translate([width/2,height/2]);
+	
+	var path = d3.geoPath()
+		.projection(projection);
+
+
+	
+	var markers = [
+  {long: 31.6340, lat: 74.8723, group: "A", size: 34}, // corsica
+  {long: 28.67, lat: 77.06, group: "A", size: 14}, // Delhi
+  {long: 22.349, lat: 78.864, group: "B", size: 87}, // Paris
+  {long: -21.397, lat: 73.664, group: "B", size: 41}, // Hossegor
+  {long: 23.075, lat: 80.640, group: "C", size: 78}, // Lille
+  {long: -23.83, lat: 88, group: "C", size: 12} // Morlaix
+];
+
+	// Load external data and boot
+	d3.json("./india2.json").then( function(data){
+		let mapInfo = topojson.feature(data, data.objects.states);
+		console.log(mapInfo);
+		svg.append("g")
+			.selectAll("path")
+			.data(mapInfo.features)
+			.join("path")
+			  .attr("fill", "#b8b8b8")
+			  .attr("d", path)
+			.style("stroke", "black")
+			.style("opacity", .3)
+
+		// Add circles:
+		svg
+			.selectAll("myCircles")
+			.data(markers)
+			.join("circle")
+				.attr("cx", d => projection([d.long, d.lat])[0])
+				.attr("cy", d => projection([d.long, d.lat])[1])
+				.attr("r", 14)
+				.style("fill", "69b3a2")
+				.attr("stroke", "#69b3a2")
+				.attr("stroke-width", 3)
+				.attr("fill-opacity", .4)
+	});
+</script>
+</body>
+<html>
