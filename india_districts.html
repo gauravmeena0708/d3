@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="description" content="$1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>District Wise</title>
+		<style>
+			.outline {
+				fill: #ddd;
+				stroke: #000;
+				stroke-width: 1px;
+			}
+			svg {
+				border-style: solid;
+				border-width: 1px;
+				border-color: #ccc;
+			}
+			
+			.boundary {
+			  fill: #ccc;
+			  stroke: #888;
+			  stroke-linejoin: round;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="chart1"></div>
+		<div id="chart2"></div>
+		<script src="http://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+		<script src="https://unpkg.com/topojson@3.0.2/dist/topojson.js"></script>
+
+		<script>
+			var width = 900, height = 600;
+		
+			var projection = d3.geoMercator();
+			var path = d3.geoPath().projection(projection);
+			var svg = d3.select("#chart1").append("svg").attr("width", width).attr("height", height);
+			var dists = [
+	"andamannicobarislands_district",
+	"andhrapradesh_district",
+	"arunachalpradesh_district",
+	"assam_district",
+	"bihar_district",
+	"chandigarh_district",
+	"chhattisgarh_district",
+	"dadranagarhaveli_district",
+	"delhi_district",
+	"dnh-and-dd",
+	"goa_district",
+	"gujarat_district",
+	"haryana_district",
+	"himachalpradesh_district",
+	"jammukashmir_district",
+	"jharkhand_district",
+	"karnataka_district",
+	"kerala_district",
+	"ladakh_district",
+	"lakshadweep_district",
+	"madhyapradesh_district",
+	"maharashtra_district",
+	"manipur_district",
+	"meghalaya_district",
+	"mizoram_district",
+	"nagaland_district",
+	"odisha_district",
+	"puducherry_district",
+	"punjab_district",
+	"rajasthan_district",
+	"sikkim_district",
+	"tamilnadu_district",
+	"telangana_district",
+	"tripura_district",
+	"uttarakhand_district",
+	"uttarpradesh_district",
+	"westbengal_district"
+];
+
+			
+			
+			var rectangles= function(svg) {
+				const randomValue = dists[Math.floor(Math.random() * dists.length)];
+				console.log(randomValue);
+				d3.json("IndianDistrictsTopoJSON.json").then(function(data) {
+					var countries = topojson.feature(data, data.objects[randomValue])
+					projection.scale(1).translate([0, 0]);
+
+					var b = path.bounds(countries),
+						s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+						t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+					projection
+					.scale(s)
+					.translate(t);
+					
+					d3.selectAll("#chart1 > *").remove();
+					var svg = d3.select("#chart1").append("svg").attr("width", width).attr("height", height);
+					svg.append("path")
+					.datum(countries)
+					.attr("class", "outline")
+					.attr("d", path);
+				});
+			}
+			
+			setInterval(function(){
+				
+				rectangles(svg);
+			},1000);
+			
+			(function(){
+
+
+  var projection = d3.geoOrthographic().clipAngle(90);
+  var path = d3.geoPath().projection(projection);
+
+  var svg = d3.select("#chart2")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  d3.json('world.json').then(function(data) {
+    var countries = topojson.feature(data, data.objects.countries);
+    var mexico = countries.features[102];
+
+    var map = svg.append('g').attr('class', 'boundary');
+    var world = map.selectAll('path').data(countries.features);
+    mexico = map.selectAll('.mexico').data([mexico]);
+
+    projection.scale(1).translate([0, 0]);
+    var b = path.bounds(countries);
+    var s = .9 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+    var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+    projection.scale(s).translate(t);
+
+    world.enter()
+        .append('path')
+        .attr('d', path);
+
+    mexico.enter()
+        .append('path')
+        .attr('class', 'mexico')
+        .attr('d', path)
+        .style('fill', 'lightyellow').style('stroke', 'orange');
+
+    d3.timer(function(elapsed) {
+      projection.rotate([0.02 * elapsed, 0, 0]);
+      map.selectAll('path').attr('d', path);
+    });
+
+  });
+
+})();
+		</script>
+	</body>
+</html>
