@@ -14,9 +14,7 @@
     <script>
     var width = window.innerWidth, height = window.innerHeight;
 
-    var projection = d3.geoMercator();
-	
-	var projection1 = d3.geoMercator()
+    var projection  = d3.geoMercator()
                     .scale(800)
 					.center([77,21])
 					.translate([width/2,height/2]);
@@ -32,12 +30,12 @@
     var g = svg.append("g");
 
 	var markers = [
-  {long: 31.6340, lat: 74.8723, group: "ABC", size: 34}, // corsica
-  {long: 28.67, lat: 77.06, group: "DEF", size: 14}, // Delhi
-  {long: 22.349, lat: 78.864, group: "GHI", size: 87}, // Paris
-  {long: -21.397, lat: 73.664, group: "JKL", size: 41}, // Hossegor
+  {long: 74.8723, lat:31.6340 , group: "ABC", size: 34}, // corsica
+  {long: 77.06, lat: 28.67, group: "DEF", size: 1}, // Delhi
+  {long: 78.864, lat: 22.349, group: "GHI", size: 87}, // Paris
+  {long: 73.664, lat:-21.397 , group: "JKL", size: 41}, // Hossegor
   {long: 75.857727, lat: 22.719568, group: "MNOP", size: 78}, // Lille
-  {long: -23.83, lat: 88, group: "QRST", size: 12} // Morlaix
+  {long: 88, lat: -23.83, group: "QRST", size: 1200} // Morlaix
 ];
 
     d3.json("india2.json", function(error, data){
@@ -144,12 +142,11 @@
 			.enter().append('circle')
 				.attr("cx", function(d) 
 					{ 
-						x = projection1([d.long, d.lat])[0]
-						console.log(x);
+						x = projection([d.long, d.lat])[0]
 						return x;
 					}
-				)//d => projection([d.long, d.lat])[0])
-				.attr("cy", d => projection1([d.long, d.lat])[1])
+				)
+				.attr("cy", d => projection([d.long, d.lat])[1])
 				.attr("r", 14)
 				.style("fill", "#69b3a2")
 				.attr("stroke", "#69b3a2")
