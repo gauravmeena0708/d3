@@ -36,7 +36,7 @@
     // load GeoJSON data
     d3.json("bengalurug1.json", function(error, data) {
       if (error) throw error;
-      
+      console.log(data);
       // bind data to svg path elements
       var areas = svg.selectAll("path")
                      .data(data.features)
