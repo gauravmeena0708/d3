@@ -27,6 +27,12 @@
                 .attr("width", width)
                 .attr("height", height);
     
+    // define color scale
+    var color = d3.scaleLinear()
+                  .range(["white", "blue"])
+                  .domain([0, 1]);
+    
+    
     // load GeoJSON data
     d3.json("bengalurug1.json", function(error, data) {
       if (error) throw error;
@@ -43,10 +49,6 @@
                      });
     });
     
-    // define color scale
-    var color = d3.scaleLinear()
-                  .range(["white", "blue"])
-                  .domain([0, 1]);
   </script>
 </body>
 </html>
